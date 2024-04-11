@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matrix Input</title>
+<style>
+    table {
+        border-collapse: collapse;
+    }
+    table, th, td {
+        border: 1px solid black;
+    }
+    input[type="number"] {
+        width: 40px;
+    }
+    .spacer {
+        height: 10px
+    }
+    .spacerL {
+        height: 15px
+    }
+</style>
+</head>
+<body>
+
+<h2>Enter the number of rows and columns:</h2>
+<form id="matrixForm">
+    <label for="rows">Rows:</label>
+    <input type="number" id="rows" name="rows" min="1" required>
+    <label for="columns">Columns:</label>
+    <input type="number" id="columns" name="columns" min="1" required>
+    <br/>
+    <div class = "spacerL"></div>
+    <button type="submit">Generate Matrix</button>
+</form>
+
+<div id="matrixContainer"></div>
+
+<script>
+    document.getElementById("matrixForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        generateMatrix();
+    });
+
+    function generateMatrix() {
+        var rows = parseInt(document.getElementById("rows").value);
+        var columns = parseInt(document.getElementById("columns").value);
+
+        var matrixHTML = "<h2>Matrix Input</h2><table>";
+        for (var i = 0; i < rows; i++) {
+            matrixHTML += "<tr>";
+            for (var j = 0; j < columns; j++) {
+                matrixHTML += "<td><input type='number'></td>";
+            }
+            matrixHTML += "</tr>";
+        }
+        matrixHTML += "</table>";
+
+        document.getElementById("matrixContainer").innerHTML = matrixHTML;
+    }
+</script>
+
+</body>
+</html>
