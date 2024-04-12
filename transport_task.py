@@ -1,36 +1,7 @@
-FLAG_END = False
-"""def find_cycle(mat: list, pos: tuple, dir_row: bool = True, path: list = None) -> list:
-    # Построение цикла опорного плана транспортной задачи.
-    # При условии, что цикл существует и он единственный.
-    
-    global FLAG_END
-
-    if not path:
-        path = [pos]
-    ii, jj = pos
-    if dir_row:
-        neighbors = [(ii, k) for k in range(len(mat[0])) if k != jj and mat[ii][k]]
-    else:
-        neighbors = [(k, jj) for k in range(len(mat)) if k != ii and mat[k][jj]]
-    if neighbors:
-        if start_point in neighbors:
-            FLAG_END = True
-            return path
-        else:
-            dir_row = not dir_row
-            for neighbor in neighbors:
-                path.append(neighbor)
-                find_cycle(mat, neighbor, dir_row, path)
-                if FLAG_END:
-                    break
-                else:
-                    path.pop()
-    return path """
-
 
 
 def solveTrans(c, A, B) :
-
+    FLAG_END = False
 
 
     #уравниваем поставщиков и покупателей
