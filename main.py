@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
+import json
 
 from transport_task import solveTrans
 
@@ -16,10 +17,13 @@ def index():
 def solve():
     data = request.json
     print("Received JSON array:")
-    print(data)
+    
+    result = solveTrans(data['priceMatrix'], data['A'], data["B"])
+    # print(jsonDict)
     # You can process the data here
     # For now, let's just send back a confirmation message
-    response = jsonify({"message": "Received the matrix successfully!"})
+    # response = jsonify({"message": "Received the matrix successfully!"})
+    response = jsonify(result)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 

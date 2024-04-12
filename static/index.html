@@ -64,7 +64,7 @@
 </body>
 </html> -->
 
-
+<!-- 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -140,6 +140,135 @@
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(matrix)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Response:', data);
+            // Handle response here
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>
+
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matrix Input</title>
+<style>
+    table {
+        border-collapse: collapse;
+    }
+    table, th, td {
+        border: 1px solid black;
+    }
+    th, td {
+        padding: 8px;
+        text-align: center;
+    }
+    th.offer, td.offer {
+        background-color: #66c2ff; /* Light blue */
+    }
+    td.demand {
+        background-color: #ff9999; /* Light red */
+    }
+    input[type="number"] {
+        width: 40px;
+    }
+</style>
+</head>
+<body>
+
+<h2>Enter the number of rows and columns:</h2>
+<form id="matrixForm">
+    <label for="rows">Rows:</label>
+    <input type="number" id="rows" name="rows" min="1" required>
+    <label for="columns">Columns:</label>
+    <input type="number" id="columns" name="columns" min="1" required>
+    <button type="submit">Generate Matrix</button>
+</form>
+
+<div id="matrixContainer"></div>
+
+<script>
+    document.getElementById("matrixForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        generateMatrix();
+    });
+
+    function generateMatrix() {
+        var rows = parseInt(document.getElementById("rows").value);
+        var columns = parseInt(document.getElementById("columns").value);
+
+        var matrixHTML = "<h2>Matrix Input</h2><table>";
+        matrixHTML += "<tr><td>Offer/Demand</td>"; // Static cell for the first column header
+        for (var j = 0; j < columns; j++) {
+            matrixHTML += "<td class='offer'><input type='number' id='cell_-1_" + j + "'></td>"; // Add input field for first row
+        }
+        matrixHTML += "</tr>";
+        for (var i = 0; i < rows; i++) {
+            matrixHTML += "<tr>";
+            matrixHTML += "<td class='offer'><input type='number' id='cell_" + i + "_-1'></td>"; // Add input field for first column
+            for (var j = 0; j < columns; j++) {
+                matrixHTML += "<td><input type='number' id='cell_" + i + "_" + j + "'></td>";
+            }
+            matrixHTML += "</tr>";
+        }
+        matrixHTML += "</table><button onclick='sendMatrix()'>Send Matrix</button>";
+
+        document.getElementById("matrixContainer").innerHTML = matrixHTML;
+    }
+
+    function sendMatrix() {
+        var rows = parseInt(document.getElementById("rows").value);
+        var columns = parseInt(document.getElementById("columns").value);
+        var priceMatrix = [];
+        var A =[]
+        var B = []
+
+        for (var i = -1; i < rows; i++) {
+            var row = [];
+            for (var j = -1; j < columns; j++) {
+                if (i!= -1 || j!= -1) {
+                    var cellValue = parseInt(document.getElementById("cell_" + i + "_" + j).value);
+                    //console.log (`i = ${i} j = ${j} value = ${cellValue}`)
+    
+                    if (j==-1) {
+                        B.push(cellValue)
+                    } else {
+                        row.push(cellValue);
+                        
+                    }
+                }
+            }
+            if (i == -1 ) {
+                A = row;
+            } else {
+                priceMatrix.push(row);
+            }
+        }
+
+        resultArray = {
+            "priceMatrix": priceMatrix,
+            "A": A,
+            "B": B
+        }
+        //console.log (resultArray)
+
+        // Sending matrix data to the server
+        fetch('http://localhost:5000/solve', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(resultArray)
         })
         .then(response => response.json())
         .then(data => {
