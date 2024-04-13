@@ -1,6 +1,15 @@
 
 
 def solveTrans(c, A, B) :
+
+    def getEmptyStringWithSameLength(stringie):
+        new_string = ""
+        for i in range(0, len(str(stringie))):
+            new_string += "⠀"
+
+        return new_string
+                    
+
     FLAG_END = False
 
 
@@ -26,7 +35,9 @@ def solveTrans(c, A, B) :
     # print ('a' != 'a')
     # \print (a, b)
     print ("")
-    print ("starting array")
+    print ("A", A)
+    print ("B", B)
+    print ("starting array:")
     for i in c:
         print (i)
     print ("")
@@ -93,8 +104,8 @@ def solveTrans(c, A, B) :
             sol_list.append(new_line) 
 
             print ("iteration", attempt_counter )
-            print ("⠀⠀⠀ ⠀", B)
-            print ("⠀⠀⠀ ⠀", local_b)
+            print (getEmptyStringWithSameLength(A[0]), getEmptyStringWithSameLength(local_a[0]), B)
+            print (getEmptyStringWithSameLength(A[0]), getEmptyStringWithSameLength(local_a[0]), local_b)
             for i in range(len(sol_list)):
                 print (A[i], local_a[i], sol_list[i], )
             print ("")
@@ -149,8 +160,8 @@ def solveTrans(c, A, B) :
 
         for line in range (len(local_a)):
             for col in range (len(local_b)):
-                #print (potencial_a[line][col] , potencial_b[line][col], c[line][col])
-                dif_pot = (potencial_a[line] + potencial_b[col]) - c[line][col]
+                print (potencial_a[line] , potencial_b[col], c[line][col])
+                dif_pot = (int(potencial_a[line]) + int(potencial_b[col])) - int(c[line][col])
                 if dif_pot > 0:
                     dif[line][col] = dif_pot
                     if dif_pot>gratest_dif:

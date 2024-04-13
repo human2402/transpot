@@ -155,7 +155,7 @@
 </body>
 </html> -->
 
-
+<!-- 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -263,7 +263,7 @@
         //console.log (resultArray)
 
         // Sending matrix data to the server
-        fetch('http://192.168.0.200:5000/solve', {
+        fetch('http://127.0.0.1:5000/solve', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -278,6 +278,182 @@
         .catch(error => {
             console.error('Error:', error);
         });
+    }
+</script>
+
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matrix Input</title>
+<style>
+    table {
+        border-collapse: collapse;
+    }
+    table, th, td {
+        border: 1px solid black;
+    }
+    th, td {
+        padding: 8px;
+        text-align: center;
+    }
+    th.offer, td.offer {
+        background-color: #66c2ff; /* Light blue */
+    }
+    td.demand {
+        background-color: #ff9999; /* Light red */
+    }
+    input[type="number"] {
+        width: 40px;
+    }
+    .spacer {
+        height: 15px;
+    }
+</style>
+</head>
+<body>
+
+<h2>Enter the number of rows and columns:</h2>
+<form id="matrixForm">
+    <label for="rows">Rows:</label>
+    <input type="number" value = '2' id="rows" name="rows" min="1" required>
+    <label for="columns">Columns:</label>
+    <input value = '3' type="number" id="columns" name="columns" min="1" required>
+    <div class = "spacer"></div>
+    <button type="submit">Generate Matrix</button>
+</form>
+
+<div id="matrixContainer"></div>
+<div id="tablesContainer"></div>
+
+<script>
+    document.getElementById("matrixForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        generateMatrix();
+    });
+
+    function generateMatrix() {
+        var rows = parseInt(document.getElementById("rows").value);
+        var columns = parseInt(document.getElementById("columns").value);
+
+        var matrixHTML = "<h2>Matrix Input</h2><table>";
+        matrixHTML += "<tr><td>Offer/Demand</td>"; // Static cell for the first column header
+        for (var j = 0; j < columns; j++) {
+            matrixHTML += "<td class='offer'><input type='number' value = '4' id='cell_-1_" + j + "''></td>"; // Add input field for first row
+        }
+        matrixHTML += "</tr>";
+        for (var i = 0; i < rows; i++) {
+            matrixHTML += "<tr>";
+            matrixHTML += "<td class='offer'><input value = '2' type='number' id='cell_" + i + "_-1'></td>"; // Add input field for first column
+            for (var j = 0; j < columns; j++) {
+                matrixHTML += "<td><input type='number' value = '3' id='cell_" + i + "_" + j + "'></td>";
+            }
+            matrixHTML += "</tr>";
+        }
+        matrixHTML += "<div class = 'spacer'></div> </table><button onclick='sendMatrix()'>Send Matrix</button>";
+
+        document.getElementById("matrixContainer").innerHTML = matrixHTML;
+    }
+
+    function sendMatrix() {
+        var rows = parseInt(document.getElementById("rows").value);
+        var columns = parseInt(document.getElementById("columns").value);
+        var priceMatrix = [];
+        var A =[]
+        var B = []
+
+        for (var i = -1; i < rows; i++) {
+            var row = [];
+            for (var j = -1; j < columns; j++) {
+                if (i!= -1 || j!= -1) {
+                    var cellValue = parseInt(document.getElementById("cell_" + i + "_" + j).value);
+                    //console.log (`i = ${i} j = ${j} value = ${cellValue}`)
+    
+                    if (j==-1) {
+                        B.push(cellValue)
+                    } else {
+                        row.push(cellValue);
+                        
+                    }
+                }
+            }
+            if (i == -1 ) {
+                A = row;
+            } else {
+                priceMatrix.push(row);
+            }
+        }
+
+        resultArray = {
+            "priceMatrix": priceMatrix,
+            "A": A,
+            "B": B
+        }
+        //console.log (resultArray)
+
+        // Sending matrix data to the server
+        fetch('http://127.0.0.1:5000/solve', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(resultArray)
+        })
+        
+  .then(response => response.json())
+  .then(data => {
+    // Function to create a table for a given iteration or final result
+    function createTable(iteration) {
+        console.log (data);
+      const array = iteration === 'final_result' ? data.final_result.array : data[`iteration_${iteration}`].array;
+      const priceB = data[`price_B`];
+
+      // Create table element
+      const table = document.createElement('table');
+      const tbody = document.createElement('tbody');
+
+      // Add header row (priceB)
+      let headerRow = '<tr><th></th>';
+      priceB.forEach(price => {
+        headerRow += `<th>${price}</th>`;
+      });
+      headerRow += '</tr>';
+      tbody.innerHTML += headerRow;
+
+      // Add array rows
+      array.forEach(row => {
+        let tableRow = '<tr>';
+        row.forEach((item, index) => {
+          if (index === 0) {
+            tableRow += `<td>${item}</td>`;
+          } else {
+            tableRow += `<td>${item}</td>`;
+          }
+        });
+        tableRow += '</tr>';
+        tbody.innerHTML += tableRow;
+      });
+
+      // Append tbody to table
+      table.appendChild(tbody);
+
+      // Append table to DOM
+      document.getElementById('tablesContainer').appendChild(table);
+    }
+
+    // Create tables for each iteration and final result
+    for (let i = 0; i <= 2; i++) {
+      createTable(i);
+    }
+    createTable('final_result');
+  })
+  .catch(error => console.error('Error fetching data:', error));
+
     }
 </script>
 
