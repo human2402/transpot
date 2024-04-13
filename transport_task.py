@@ -183,20 +183,18 @@ def solveTrans(c, A, B) :
 
         isNotOk = False
         
-        print ("⠀⠀⠀ ⠀", B)
-        print ("⠀⠀⠀ ⠀", local_b)
+        print (getEmptyStringWithSameLength(A[0]), getEmptyStringWithSameLength(local_a[0]), B)
+        print (getEmptyStringWithSameLength(A[0]), getEmptyStringWithSameLength(local_a[0]), local_b)
         for i in range(len(sol_list)):
             print (A[i], local_a[i], sol_list[i], potencial_a[i])
 
-        print ("⠀⠀⠀ ⠀", potencial_b)
+        print (getEmptyStringWithSameLength(A[0]), getEmptyStringWithSameLength(local_a[0]), potencial_b)
         print ("")
 
         result_dict ["final_result"] = {
             "array" : sol_list,
-            "a" : local_a,
-            "b": local_b,
-            "pot_a": potencial_a,
-            "pot_b": potencial_b         
+            "a" : potencial_a,
+            "b": potencial_b        
         }
 
     # print (a, b)
