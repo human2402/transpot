@@ -35,16 +35,16 @@ def solveTrans(c, A, B) :
     # print ('a' != 'a')
     # \print (a, b)
     print ("")
-    print ("A", A)
-    print ("B", B)
+    print ("A:", A)
+    print ("B:", B)
     print ("starting array:")
     for i in c:
         print (i)
     print ("")
 
     attempt_counter = 0
-    isNotOk = True
-    while isNotOk:
+    isOK = False
+    while not isOK:
         local_a, local_b = [], []
         for i in A:
             local_a.append(i)
@@ -181,7 +181,7 @@ def solveTrans(c, A, B) :
         # sol_list[i][j] = 0
         # FLAG_END = False
 
-        isNotOk = False
+        isOK = True
         
         print (getEmptyStringWithSameLength(A[0]), getEmptyStringWithSameLength(local_a[0]), B)
         print (getEmptyStringWithSameLength(A[0]), getEmptyStringWithSameLength(local_a[0]), local_b)
