@@ -39,8 +39,7 @@ def find_cycle(mat: list, pos: tuple, dir_row: bool = True, path: list = None, v
                         visited.remove(neighbor)
     return None
 
-def godPleaseWork(c, A, B):
-    def getEmptyStringWithSameLength(stringie):
+def getEmptyStringWithSameLength(stringie):
         new_string = ""
         for i in range(0, len(str(stringie))):
             new_string += "⠀"
@@ -48,6 +47,9 @@ def godPleaseWork(c, A, B):
         return new_string
 
 
+
+def godPleaseWork(c, A, B):
+    
     result_dict = {"starting_array": c, "price_A": A, "price_B": B}
 
     # Ensure supplies and demands are balanced
@@ -129,121 +131,132 @@ def godPleaseWork(c, A, B):
     
     
     if isSupported:
-        priceF = 0
-        for i in range(len(allocation)):
-            for j in range(len(allocation[i])):
-                if allocation[i][j] != 'X':
-                    priceF += allocation[i][j]*c[i][j]
-                    
-        print (" ")
-        print ("F:", priceF)
-        print (" ")
-
-        # Calculate potentials
-        pot_A = ["X"] * len(A)
-        pot_B = ["X"] * len(B)
-        pot_A[0] = 0  # Arbitrarily set one potential to zero
-
-        # потанцевалы
-        for i in range(0,len(pot_A)):
-            for j in range(0, len(pot_B)):
-                if allocation[i][j]  != "X":
-                    if pot_A[i] != "X":
-                        pot_B[j] = c[i][j] - pot_A[i]
-                    else:
-                        pot_A[i] = c[i][j] - pot_B[j]
-            print (i, j, pot_A, pot_B)
-            
-        result_dict["potentials"] = {"A": pot_A, "B": pot_B}
-
-        # Print potentials
-        print("Potentials for A:", pot_A)
-        print("Potentials for B:", pot_B)
-        print (" ")
-
-        # переплаты века
-        overPrices = []
-       
-        for i in range(len(pot_A)):
-            newLine = []
-            for j in range(len(pot_B)):
-                if allocation[i][j] == "X":
-                    overing = (pot_A[i] + pot_B[j]) - c[i][j]
-                    # print (i, j, pot_A[i], pot_B[j], c[i][j], overing)
-                    newLine.append(overing)
-                else:
-                    newLine.append("X")
-            overPrices.append(newLine)
-
-        for row in overPrices:
-            print (row)
-
-        #ищем самую большую переплату
-        greatest_pos = (0,0)
-        greatest_overprice = -100
-
-        for i in range(len(pot_A)):
-            for j in range(len(pot_B)):
-                item = overPrices[i][j]
-                if item != "X":
-                    if  item >= greatest_overprice:
-                        greatest_pos = (i, j)
-                        greatest_overprice = item
-        
-        print ("Max imbalance: ", greatest_overprice,"| its postion - ", greatest_pos)
+        iterationCounter = 1
         isFine = False
-        if greatest_overprice <= 0:
-            isFine = True
-        print (" ")
-        print ("Is it final: ", isFine) 
-        print (" ")
+        while isFine == False and iterationCounter < 10:
+            print (" ")
+            print (" ")
+            print ("ITERATION:", iterationCounter)
+            priceF = 0
+            for i in range(len(allocation)):
+                for j in range(len(allocation[i])):
+                    if allocation[i][j] != 'X':
+                        priceF += allocation[i][j]*c[i][j]
+                        
+            print (" ")
+            print ("F:", priceF)
+            print (" ")
 
+            # Calculate potentials
+            pot_A = ["X"] * len(A)
+            pot_B = ["X"] * len(B)
+            pot_A[0] = 0  # Arbitrarily set one potential to zero
 
-        #let us find the cycle
-        if not isFine:
-            localAlocation = allocation
-            localAlocation[greatest_pos[0]][greatest_pos[1]] = 0
-            cycle_with_cycle = find_cycle(localAlocation, greatest_pos)
-
-            min_minus = 999999
-            for i in range(1,len(cycle_with_cycle), 2):
-                elem = cycle_with_cycle[i]
-                if allocation[elem[0]][elem[1]] < min_minus:
-                    min_minus = allocation[elem[0]][elem[1]]
-            print("Cycle:", cycle_with_cycle)
-            print ("Min element:", min_minus)
-
-            # let us have the allocation calculated
-            for i in range(0,len(cycle_with_cycle)):
-                elem = cycle_with_cycle[i]
+            # потанцевалы
+            for att in range(2):
+                for i in range(0,len(pot_A)):
+                    for j in range(0, len(pot_B)):
+                        if allocation[i][j]  != "X":
+                            if pot_A[i] != "X":
+                                pot_B[j] = c[i][j] - pot_A[i]
+                            else:
+                                if pot_B[j] != "X":
+                                    pot_A[i] = c[i][j] - pot_B[j]
+                    print (i, j,c[i][j], pot_A, pot_B)
                 
-                if i%2 == 0:
-                    if allocation[elem[0]][elem[1]] != "X":
-                        allocation[elem[0]][elem[1]] += min_minus
+            result_dict["potentials"] = {"A": pot_A, "B": pot_B}
+
+            # Print potentials
+            print("Potentials for A:", pot_A)
+            print("Potentials for B:", pot_B)
+            print (" ")
+
+            # переплаты века
+            overPrices = []
+        
+            for i in range(len(pot_A)):
+                newLine = []
+                for j in range(len(pot_B)):
+                    if allocation[i][j] == "X":
+                        overing = (pot_A[i] + pot_B[j]) - c[i][j]
+                        # print (i, j, pot_A[i], pot_B[j], c[i][j], overing)
+                        newLine.append(overing)
                     else:
-                        allocation[elem[0]][elem[1]] = min_minus
-                else:
-                    allocation[elem[0]][elem[1]] -= min_minus
-                    if (allocation[elem[0]][elem[1]]) <= 0:
-                        allocation[elem[0]][elem[1]] = "X"
+                        newLine.append("X")
+                overPrices.append(newLine)
 
-            print (" " )
-            print ("New matrix: ")
+            for row in overPrices:
+                print (row)
+
+            #ищем самую большую переплату
+            greatest_pos = (0,0)
+            greatest_overprice = -100
+
+            for i in range(len(pot_A)):
+                for j in range(len(pot_B)):
+                    item = overPrices[i][j]
+                    if item != "X":
+                        if  item >= greatest_overprice:
+                            greatest_pos = (i, j)
+                            greatest_overprice = item
             
-            for i in allocation:
-                print (i) 
-                
-                
+            print ("Max imbalance: ", greatest_overprice,"| its postion - ", greatest_pos)
             
+            if greatest_overprice <= 0:
+                isFine = True
+            print (" ")
+            print ("Is it final: ", isFine) 
+            print (" ")
+
+
+            #let us find the cycle
+            if not isFine:
+                localAlocation = allocation
+                localAlocation[greatest_pos[0]][greatest_pos[1]] = 0
+                cycle_with_cycle = find_cycle(localAlocation, greatest_pos)
+
+                min_minus = 999999
+                for i in range(1,len(cycle_with_cycle), 2):
+                    elem = cycle_with_cycle[i]
+                    if allocation[elem[0]][elem[1]] < min_minus:
+                        min_minus = allocation[elem[0]][elem[1]]
+                print("Cycle:", cycle_with_cycle)
+                print ("Min element:", min_minus)
+
+                # let us have the allocation calculated
+                for i in range(0,len(cycle_with_cycle)):
+                    elem = cycle_with_cycle[i]
+                    
+                    if i%2 == 0:
+                        if allocation[elem[0]][elem[1]] != "X":
+                            allocation[elem[0]][elem[1]] += min_minus
+                        else:
+                            allocation[elem[0]][elem[1]] = min_minus
+                    else:
+                        allocation[elem[0]][elem[1]] -= min_minus
+                        if (allocation[elem[0]][elem[1]]) <= 0:
+                            allocation[elem[0]][elem[1]] = "X"
+
+                print (" " )
+                print ("New matrix: ")
+
+                for i in allocation:
+                    print (i) 
+                iterationCounter += 1
+                
+                    
+            else:
+                return result_dict            
 
 
 
 
     else:
         print("plan failed")
+        return "plan failed"
         
     # result_dict["initial_allocation"] = allocation
-    
+        
 
 
 
@@ -252,7 +265,7 @@ def godPleaseWork(c, A, B):
 
 c = [[12, 15, 21, 14],
      [14, 8, 15, 11],
-     [19, 16, 26, 12]]
+     [19, 6, 26, 12]]
 
 A = [200, 150, 160]
 B = [100, 100, 160, 140]
