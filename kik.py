@@ -47,14 +47,14 @@ def find_cycle(mat: list, pos: tuple, dir_row: bool = True, path: list = None) -
                     path.pop()
     return path
 
-# for start_point in start_points:
-start_point  = (2, 1)
-i, j = (2,1)
-matrix[i][j] = -1
-way = find_cycle(matrix, (2,1))
-matrix[i][j] = 0
-FLAG_END = False
-print(way)
+for start_point in start_points:
+    # start_point  = (2, 1)
+    i, j = start_point
+    matrix[i][j] = -1
+    way = find_cycle(matrix, (2,1))
+    matrix[i][j] = 0
+    FLAG_END = False
+    print(way)
 
 # --------------------------------------
 
