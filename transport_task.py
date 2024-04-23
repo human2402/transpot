@@ -2,6 +2,14 @@
 
 def solveTrans(c, A, B) :
 
+    c = [[12, 15, 21, 14],
+    [14, 8, 15, 11],
+    [19, 16, 26, 12]]
+
+
+    A = [200, 150, 160,]
+    B = [100, 100, 160, 140]
+
     def getEmptyStringWithSameLength(stringie):
         new_string = ""
         for i in range(0, len(str(stringie))):
@@ -30,10 +38,7 @@ def solveTrans(c, A, B) :
                 "price_A": A,
                 "price_B": B};
 
-    # print (sum(A) , sum(B))
-
-    # print ('a' != 'a')
-    # \print (a, b)
+    
     print ("")
     print ("A:", A)
     print ("B:", B)

@@ -46,12 +46,24 @@ def getEmptyStringWithSameLength(stringie):
 
         return new_string
 
+def getLocalElement(arr):
+    loc_al = []
+    for row in arr:
+        newLine = []
+        for item in row:
+            newLine.append(item)
+        loc_al.append(newLine)
+    return loc_al
+
+def solveTask(c, A, B):
 
 
-def godPleaseWork(c, A, B):
-    
-    result_dict = {"starting_array": c, "price_A": A, "price_B": B}
+    # c = [[12, 15, 21, 14],
+    #  [14, 8, 15, 11],
+    #  [19, 6, 26, 12]]
 
+    # A = [200, 150, 160]
+    # B = [100, 100, 160, 140]
     # Ensure supplies and demands are balanced
     balanced = 0
     if sum(A) != sum(B):
@@ -66,6 +78,14 @@ def godPleaseWork(c, A, B):
             B.append(newNum)
             for row in c:
                 row.append(0)
+
+    result_dict = {
+                "is_there_error": False,
+                "starting_array": c,
+                "price_A": A,
+                "price_B": B,
+                "ab_difference": balanced
+                };
         
     
     print ("A:", A)
@@ -127,13 +147,26 @@ def godPleaseWork(c, A, B):
                 usedCellsCount += 1
     if usedCellsCount == supposedCellsCount:
         isSupported = True
-    print("used cells:", usedCellsCount, "| m+n-1:", usedCellsCount)
+
+    print("used cells:", usedCellsCount, "| m+n-1:", supposedCellsCount)
+
+    loc_al = getLocalElement(allocation)
+    result_dict["first_plan"] = {
+                "type": "base_plan",
+                "array": loc_al,
+                "a": A,
+                "b": B,
+                "busy_cells": usedCellsCount, 
+                "m+n-1": supposedCellsCount
+            }
     
     
     if isSupported:
         iterationCounter = 1
         isFine = False
         while isFine == False and iterationCounter < 10:
+            
+
             print (" ")
             print (" ")
             print ("ITERATION:", iterationCounter)
@@ -146,6 +179,8 @@ def godPleaseWork(c, A, B):
             print (" ")
             print ("F:", priceF)
             print (" ")
+
+            
 
             # Calculate potentials
             pot_A = ["X"] * len(A)
@@ -165,6 +200,14 @@ def godPleaseWork(c, A, B):
                     print (i, j,c[i][j], pot_A, pot_B)
                 
             result_dict["potentials"] = {"A": pot_A, "B": pot_B}
+
+            loc_al = getLocalElement(allocation)
+            result_dict["iteration_"+str(iterationCounter)] = {
+                "type": "new_plan",
+                "array": loc_al,
+                "a": pot_A,
+                "b": pot_B,
+            }
 
             # Print potentials
             print("Potentials for A:", pot_A)
@@ -207,7 +250,13 @@ def godPleaseWork(c, A, B):
             print (" ")
             print ("Is it final: ", isFine) 
             print (" ")
-
+            
+            result_dict["iteration_"+str(iterationCounter)]["_overprice"] = {
+                "array": overPrices,
+                "is_fine": isFine,
+                "greatest_overprice": greatest_overprice,
+                "greatest_pos": greatest_pos
+            }
 
             #let us find the cycle
             if not isFine:
@@ -222,6 +271,12 @@ def godPleaseWork(c, A, B):
                         min_minus = allocation[elem[0]][elem[1]]
                 print("Cycle:", cycle_with_cycle)
                 print ("Min element:", min_minus)
+
+                result_dict["iteration_"+str(iterationCounter)]["_cycle"] = {
+                    "cycle": cycle_with_cycle,
+                    "min_element": min_minus
+                }
+            
 
                 # let us have the allocation calculated
                 for i in range(0,len(cycle_with_cycle)):
@@ -246,14 +301,17 @@ def godPleaseWork(c, A, B):
                 
                     
             else:
+                result_dict["iteration_count"] = iterationCounter
                 return result_dict            
 
 
 
 
     else:
-        print("plan failed")
-        return "plan failed"
+        
+        result_dict["is_there_error"] = True
+        result_dict["error_message"] = "plan failed"
+        return result_dict  
         
     # result_dict["initial_allocation"] = allocation
         
@@ -270,4 +328,4 @@ c = [[12, 15, 21, 14],
 A = [200, 150, 160]
 B = [100, 100, 160, 140]
 
-result = godPleaseWork(c, A, B)
+# print( solveTask(c, A, B))

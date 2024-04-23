@@ -5,6 +5,7 @@ import traceback
 
 # from transport_task import solveTrans
 from transport_task1 import solveTrans
+from task_rewrite import solveTask
 
 app = Flask(__name__, template_folder=".\\static", static_folder=".\\static")
 CORS(app)
@@ -23,7 +24,9 @@ def solve():
     print("Received JSON array:")
     print(data['priceMatrix'])
     print (data['B'], data["A"])
-    result = solveTrans(data['priceMatrix'], data['B'], data["A"])
+    # result = solveTrans(data['priceMatrix'], data['B'], data["A"])
+    result = solveTask(data['priceMatrix'], data['B'], data["A"])
+    print (result)
     # result = {}
     # try:
     # # Your code here
@@ -46,4 +49,4 @@ def solve():
     return response
 
 if __name__ == '__main__':
-    app.run(host="127.0.0.1", port="5025", debug=True)
+    app.run(host="127.0.0.1", port="5099", debug=True)

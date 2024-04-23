@@ -21,7 +21,7 @@
     table, th, td {
         border: 1px solid black;
     }
-    th, td {
+    th, td , p{
         padding: 8px;
         text-align: center;
     }
@@ -38,25 +38,40 @@
         height: 15px;
     }
     h3{
+        padding-top:25px;
+    }
+    h3, label, h2{
         text-align: center;
     }
+    .centering , table{
+        margin:15px;
+        display: flex;
+        justify-content: space-evenly;
+    }
+    span {padding: 10px;}
 </style>
 </head>
 <body>
-
-<h2>Enter the number of rows and columns:</h2>
-<form id="matrixForm">
-    <label for="rows">Rows:</label>
-    <input type="number" value = '2' id="rows" name="rows" min="1" required>
-    <label for="columns">Columns:</label>
-    <input value = '3' type="number" id="columns" name="columns" min="1" required>
-    <div class = "spacer"></div>
-    <button type="submit">Generate Matrix</button>
-</form>
-
-<div id="matrixContainer"></div>
-<div id="tablesContainer"></div>
-
+<div class="centering">
+    <div>
+    <h2>Введите кол-во строк и столбцов:</h2>
+        <form id="matrixForm">
+            <div class="centering">
+                <label for="rows">Строк:</label>
+                <input type="number" value = '3' id="rows" name="rows" min="1" required>
+                <label for="columns">Столбцов:</label>
+                <input value = '4' type="number" id="columns" name="columns" min="1" required>
+            <div class = "spacer"></div>
+            </div><div class="centering">
+                <button type="submit">Сгенерировать</button>
+            </div>
+        </form>
+        <div class="centering">
+        <div id="matrixContainer"></div>
+    </div>
+        <div id="tablesContainer"></div>
+    </div>
+</div>
 <script>
     document.getElementById("matrixForm").addEventListener("submit", function(event) {
         event.preventDefault();
@@ -67,21 +82,21 @@
         var rows = parseInt(document.getElementById("rows").value);
         var columns = parseInt(document.getElementById("columns").value);
 
-        var matrixHTML = "<h2>Matrix Input</h2><table>";
-        matrixHTML += "<tr><td>Offer/Demand</td>"; // Static cell for the first column header
+        var matrixHTML = "<h2>Ввод матриц</h2><table>";
+        matrixHTML += "<tr><td>Потр./Постав.</td>"; // Static cell for the first column header
         for (var j = 0; j < columns; j++) {
-            matrixHTML += "<td class='offer'><input type='number' value = '4' id='cell_-1_" + j + "''></td>"; // Add input field for first row
+            matrixHTML += "<td class='offer'><input type='number'  id='cell_-1_" + j + "''></td>"; // Add input field for first row
         }
         matrixHTML += "</tr>";
         for (var i = 0; i < rows; i++) {
             matrixHTML += "<tr>";
-            matrixHTML += "<td class='offer'><input value = '2' type='number' id='cell_" + i + "_-1'></td>"; // Add input field for first column
+            matrixHTML += "<td class='offer'><input  type='number' id='cell_" + i + "_-1'></td>"; // Add input field for first column
             for (var j = 0; j < columns; j++) {
-                matrixHTML += "<td><input type='number' value = '3' id='cell_" + i + "_" + j + "'></td>";
+                matrixHTML += "<td><input type='number' ' id='cell_" + i + "_" + j + "'></td>";
             }
             matrixHTML += "</tr>";
         }
-        matrixHTML += " </table><div class = 'spacer'></div><button onclick='sendMatrix()'>Send Matrix</button><div class = 'spacer'></div>";
+        matrixHTML += " </table><div class = 'spacer'></div><button onclick='sendMatrix()'>Отправить матрицу</button><span id='error_disp'></span><div class = 'spacer'></div>";
 
         document.getElementById("matrixContainer").innerHTML = matrixHTML;
     }
@@ -92,14 +107,23 @@
         var priceMatrix = [];
         var A =[]
         var B = []
-
+        errorFlag = false;
         for (var i = -1; i < rows; i++) {
             var row = [];
             for (var j = -1; j < columns; j++) {
                 if (i!= -1 || j!= -1) {
-                    var cellValue = parseInt(document.getElementById("cell_" + i + "_" + j).value);
-                    //console.log (`i = ${i} j = ${j} value = ${cellValue}`)
-    
+                    locVal = document.getElementById("cell_" + i + "_" + j).value
+                    console.log (`value = ${locVal}`, typeof locVal)
+                    if (locVal == ""){
+                        errorFlag = true;
+                        break;
+                    }
+                    var cellValue = parseInt(locVal);
+                    
+                    if (cellValue == NaN){
+                        errorFlag = true;
+                        break;
+                    }
                     if (j==-1) {
                         B.push(cellValue)
                     } else {
@@ -114,7 +138,12 @@
                 priceMatrix.push(row);
             }
         }
+        if (errorFlag){
+            console.log("Erro!");
+            document.getElementById("error_disp").innerHTML = "Ошибка!"
+            throw new Error("wrong input");
 
+        }
         resultArray = {
             "priceMatrix": priceMatrix,
             "A": A,
@@ -123,6 +152,7 @@
         //console.log (resultArray)
 
         // Sending matrix data to the server
+        
         fetch('/solve', {
             method: 'POST',
             headers: {
@@ -131,64 +161,99 @@
             body: JSON.stringify(resultArray)
         })
         
-  .then(response => response.json())
-  .then(data => {
-    // Function to create a table for a given iteration or final result
-    function createTable(tableData, lableString) {
-        const h3 = document.createElement('div');
-        let label = `<h3>${lableString}</h3><div class="spacer"></div>`;
-        h3.innerHTML = (label);
-        iteration = 1
-        // console.log (tableData);
-        //   const array = iteration === 'final_result' ? data.final_result.array : data[`iteration_${iteration}`].array;
-        const resArray = tableData["array"]
-        const potB = tableData["b"];
-        const potA = tableData["a"];
-        // console.log (potA, potB)
-        // Create table element
-        const table = document.createElement('table');
-        const tbody = document.createElement('tbody');
+        .then(response => response.json())
+        .then(data => {
+            // Function to create a table for a given iteration or final result
+            document.getElementById('tablesContainer').innerHTML = ""
+            console.log (data)
+            if (data["is_there_error"] == false){
+                function createTable(tableData, lableString) {
+                    let cornerText =  "Пот. B/Пот. A"
+                    const h3 = document.createElement('div');
+                    if (tableData["type"] == "new_plan" ||tableData["type"] == "base_plan" ){
+                        let label = `<h3>${lableString}</h3></div>`;
+                        h3.innerHTML = (label);
+                    }
+                    console.log (tableData)
+                    const p = document.createElement('div');
+                    if (tableData["type"] == "base_plan"){
+                        cornerText = "Потр./Постав."
+                        let text= `<p>Число занятых клеток = ${tableData["busy_cells"]}, при n+m-1 = ${tableData["m+n-1"]}</p></div>`;
+                        p.innerHTML = (text);  
+                    } else if (tableData["type"] == "new_plan"){
+                        createTable({"array": tableData["_overprice"]["array"], "a": tableData["a"], "b": tableData["b"]}, "")
+                        if (tableData["_overprice"]["is_fine"] == false){
+                            let str = "Найден цикл:  "
+                            tableData["_cycle"]["cycle"].forEach(element => {
+                                str = str+ " => "+element[0] + "," + element[1] 
+                            });
+                            let text= `<p>${str}<br>
+                                Наименьшее значение для манипуляций: ${tableData["_cycle"]["min_element"]}</p>
+                            </div>`;
+                            p.innerHTML = (text);  
+                        } else{
+                            let text= `<p>Финальная версия. Потенциалы сходятся. </p></div>`;
+                        p.innerHTML = (text);  
+                        }
+                    }
+                    
+            
+            // iteration = 1
+            // console.log (tableData);
+            //   const array = iteration === 'final_result' ? data.final_result.array : data[`iteration_${iteration}`].array;
+                    const resArray = tableData["array"]
+                    const potB = tableData["b"];
+                    const potA = tableData["a"];
+                    // console.log (potA, potB)
+                    // Create table element
+                    const table = document.createElement('table');
+                    const tbody = document.createElement('tbody');
 
-        // Add header row (priceB)
-        let headerRow = '<tr><th></th>';
-            potB.forEach(pot => {
-            headerRow += `<th>${pot}</th>`;
-        });
-        headerRow += '</tr>';
-        tbody.innerHTML += headerRow;
+                    // Add header row (priceB)
+                    let headerRow = '<tr><th>'+cornerText+'</th>';
+                        potB.forEach(pot => {
+                        headerRow += `<th>${pot}</th>`;
+                    });
+                    headerRow += '</tr>';
+                    tbody.innerHTML += headerRow;
 
-        for (let index = 0; index < resArray.length; index++) {
-            const element = resArray[index];
-            let tableRow = '<tr>';
-            for (let item = -1; item < element.length; item++) {
-                
-                if (item === -1) {
-                    // console.log (potA[index])
-                    tableRow += `<td>${potA[index]}</td>`;
-                } else {
-                    const itemie = element[item];
-                    tableRow += `<td>${itemie}</td>`;
-                }
-            }
-            tableRow += '</tr>';
-            tbody.innerHTML += tableRow;
-        }
-   
-
-      // Append tbody to table
-        table.appendChild(tbody);
-
-        // Append table to DOM
-        document.getElementById('tablesContainer').appendChild(h3);
-        document.getElementById('tablesContainer').appendChild(table);
-    }
-
-    // Create tables for each iteration and final result
+                    for (let index = 0; index < resArray.length; index++) {
+                        const element = resArray[index];
+                        let tableRow = '<tr>';
+                        for (let item = -1; item < element.length; item++) {
+                            
+                            if (item === -1) {
+                                // console.log (potA[index])
+                                tableRow += `<td>${potA[index]}</td>`;
+                            } else {
+                                const itemie = element[item];
+                                tableRow += `<td>${itemie}</td>`;
+                            }
+                        }
+                        tableRow += '</tr>';
+                        tbody.innerHTML += tableRow;
+                    }
     
-    for (let i = 0; i <= 2; i++) {
-      createTable(data['iteration_'+i.toString()], 'Iteration '+i.toString());
+
+        // Append tbody to table
+            table.appendChild(tbody);
+            
+            // Append table to DOM
+            document.getElementById('tablesContainer').appendChild(h3);
+            document.getElementById('tablesContainer').appendChild(table);
+            document.getElementById('tablesContainer').appendChild(p);
+            
+        }
+
+        // Create tables for each iteration and final result
+        createTable(data["first_plan"],"Первый опорный план");
+        for (let i = 1; i <= data["iteration_count"]; i++) {
+            console.log ('iteration_'+i.toString() ,data['Итерация '+i.toString()])
+            createTable(data['iteration_'+i.toString()], 'Итерация '+i.toString());
+        
+        }
+        // createTable(data['final_result'], 'Final result');
     }
-    createTable(data['final_result'], 'Final result');
   })
   .catch(error => console.error('Error fetching data:', error));
 
